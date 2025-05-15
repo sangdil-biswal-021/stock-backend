@@ -134,12 +134,46 @@ app.get('/available-forex', async (req, res) => {
 
 
 //available stocks
+// app.get('/available-stocks', async (req, res) => {
+//   try {
+//     const { country, exchange } = req.query;
+    
+//     // Build parameters object
+//     const params = { apikey: process.env.TWELVE_DATA_KEY };
+//     if (country) params.country = country;
+//     if (exchange) params.exchange = exchange;
+
+//     const response = await axios.get(
+//       'https://api.twelvedata.com/stocks',
+//       { params }
+//     );
+
+//     // Return simplified response
+//     const stocks = response.data.data.map(stock => ({
+//       symbol: stock.symbol,
+//       name: stock.name,
+//       exchange: stock.exchange,
+//       country: stock.country
+//     }));
+
+//     res.json(stocks);
+
+//   } catch (error) {
+//     res.status(500).json({ 
+//       error: "Failed to fetch stocks",
+//       details: error.response?.data?.message || error.message 
+//     });
+//   }
+// });
+
+//available stocks - free tier
+
 app.get('/available-stocks', async (req, res) => {
   try {
     const { country, exchange } = req.query;
-    
+
     // Build parameters object
-    const params = { apikey: process.env.TWELVE_DATA_KEY };
+    const params = { apikey: process.env.TWELVE_DATA_KEY, show_plan: true };
     if (country) params.country = country;
     if (exchange) params.exchange = exchange;
 
@@ -148,13 +182,15 @@ app.get('/available-stocks', async (req, res) => {
       { params }
     );
 
-    // Return simplified response
-    const stocks = response.data.data.map(stock => ({
-      symbol: stock.symbol,
-      name: stock.name,
-      exchange: stock.exchange,
-      country: stock.country
-    }));
+    // Filter for Basic plan only and return simplified response
+    const stocks = (response.data.data || [])
+      .filter(stock => stock.access && stock.access.plan === "Basic")
+      .map(stock => ({
+        symbol: stock.symbol,
+        name: stock.name,
+        exchange: stock.exchange,
+        country: stock.country
+      }));
 
     res.json(stocks);
 
@@ -165,6 +201,7 @@ app.get('/available-stocks', async (req, res) => {
     });
   }
 });
+
 
 
 
