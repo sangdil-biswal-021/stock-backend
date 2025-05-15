@@ -81,7 +81,7 @@ app.get('/convert', async (req, res) => {
       amount: parseFloat(amount),
       rate: parseFloat(response.data.rate),
       converted: parseFloat(response.data.amount),
-      // timestamp: response.data.timestamp
+      timestamp: response.data.timestamp
     });
 
   } catch (error) {
